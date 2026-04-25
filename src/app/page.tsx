@@ -2,7 +2,9 @@ import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import VibeGauge from '@/components/VibeGauge'
 import ForecastChart from '@/components/ForecastChart'
+import AIBriefing from '@/components/AIBriefing'
 import { getSurfData } from '@/lib/stormglass'
+import { generateBriefing } from '@/lib/briefing'
 import { DEFAULT_SPOT } from '@/lib/spots'
 
 // Caching is handled by 'use cache' + cacheLife('hours') inside getSurfData().
@@ -120,6 +122,9 @@ function TempIcon() {
 // ---------------------------------------------------------------------------
 export default async function HomePage() {
   const data = await getSurfData(DEFAULT_SPOT)
+  // generateBriefing runs in parallel with the page render — cached for 1 h.
+  // Falls back to data.boardPick if OPENAI_API_KEY is not set.
+  const briefingText = await generateBriefing(data, DEFAULT_SPOT)
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
@@ -194,7 +199,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* ── Board Pick ───────────────────────────────────── */}
+        {/* ── AI Board Pick ────────────────────────────────── */}
         <section
           className="rounded-2xl p-5"
           style={{
@@ -204,16 +209,25 @@ export default async function HomePage() {
         >
           <div className="flex gap-3">
             <span className="text-xl flex-shrink-0" aria-hidden>⚡</span>
-            <div>
+            <div className="min-w-0 flex-1">
               <p
-                className="text-xs font-semibold mb-1 tracking-widest"
+                className="text-xs font-semibold mb-2 tracking-widest"
                 style={{ color: '#00F5FF' }}
               >
                 AI BOARD PICK
               </p>
-              <p className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
-                {data.boardPick}
-              </p>
+              <Suspense fallback={
+                <div className="space-y-2">
+                  <div className="h-3.5 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.08)', width: '90%' }} />
+                  <div className="h-3.5 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.06)', width: '70%' }} />
+                </div>
+              }>
+                <AIBriefing
+                  initialText={briefingText}
+                  data={data}
+                  spot={DEFAULT_SPOT}
+                />
+              </Suspense>
             </div>
           </div>
         </section>

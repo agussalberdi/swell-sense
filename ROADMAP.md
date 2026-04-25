@@ -48,25 +48,25 @@
 
 ---
 
-## Phase 2 — AI Board Pick (Real) 🤖
+## Phase 2 — AI Board Pick (Real) ✅
 
 **Goal:** Replace the hardcoded board recommendation with a live AI-generated briefing.
 
-### 2.1 Vercel AI SDK Integration
-- [ ] `npm install ai @ai-sdk/openai`
-- [ ] Create `src/app/api/briefing/route.ts` — streaming Route Handler
-- [ ] Prompt template: feed structured surf data (height, period, wind, tide, vibe score) → return 2–3 sentence board pick + session tip
+### 2.1 Vercel AI SDK Integration ✅
+- [x] `npm install ai @ai-sdk/openai @ai-sdk/react` (AI SDK v6)
+- [x] Create `src/app/api/briefing/route.ts` — streaming Route Handler (`streamText` → `toTextStreamResponse()`)
+- [x] Prompt template: board quiver, conditions, 2-sentence output format
 
-### 2.2 Streaming UI
-- [ ] Create `src/components/AIBriefing.tsx` — Client Component using `useChat` or `readStreamableValue`
-- [ ] Stream text into the "AI Board Pick" card with a blinking cursor while generating
-- [ ] Cache the briefing per `(spot, date, hour)` key using `React.cache()` — avoid re-generating on every page visit
+### 2.2 Streaming UI ✅
+- [x] Create `src/components/AIBriefing.tsx` — Client Component with typewriter animation on server-precomputed text; `useCompletion` from `@ai-sdk/react` for "Ask again" live re-generation
+- [x] Blinking neon-cyan cursor while text is animating or streaming
+- [x] `generateBriefing()` in `src/lib/briefing.ts` wraps `generateText` with `'use cache'` + `cacheLife('hours')` — OpenAI called at most once per hour
 
-### 2.3 Prompt Engineering
-- [ ] Add board quiver to the prompt context: `[Shortboard, Fish, Longboard, Gun]` — AI picks the right tool
-- [ ] Include surfer skill level as a query param (`?level=intermediate`) for personalised picks
+### 2.3 Prompt Engineering ✅
+- [x] Board quiver injected into prompt: `[shortboard, fish, longboard, step-up, gun]` — AI picks the right tool
+- [ ] Include surfer skill level as a query param (`?level=intermediate`) for personalised picks — deferred to Phase 6 (Auth)
 
-**Key file:** `src/app/api/briefing/route.ts`
+**Key files:** `src/lib/briefing.ts`, `src/app/api/briefing/route.ts`, `src/components/AIBriefing.tsx`
 
 ---
 
@@ -200,4 +200,4 @@ return clamp(score, 0, 100)
 
 ---
 
-*Last updated: Phase 1 complete. Up next: Phase 2 — AI Board Pick.*
+*Last updated: Phase 2 complete. Up next: Phase 3 — Multi-Spot & Location Search.*
