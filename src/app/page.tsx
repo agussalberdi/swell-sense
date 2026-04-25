@@ -5,9 +5,9 @@ import ForecastChart from '@/components/ForecastChart'
 import { getSurfData } from '@/lib/stormglass'
 import { DEFAULT_SPOT } from '@/lib/spots'
 
-// ISR: revalidate every 30 minutes — fits Stormglass free-tier quota.
-// Swap for `revalidate = 0` (dynamic) once on a paid plan.
-export const revalidate = 1800
+// Caching is handled by 'use cache' + cacheLife('hours') inside getSurfData().
+// With dynamicIO: true, this page is rendered dynamically per-request while
+// the underlying data call is served from the Next.js Data Cache.
 
 // ---------------------------------------------------------------------------
 // Skeleton fallbacks for client component Suspense boundaries

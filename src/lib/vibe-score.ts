@@ -116,7 +116,9 @@ export function calcVibeScore(input: VibeInput): number {
   // onshore: 0
 
   // ── Swell direction alignment (bonus when swell hits beach squarely) ────
-  const swellAngleToBeach = Math.abs(input.swellDirection - (input.beachFacingDeg + 180) % 360)
+  // Swell comes FROM a direction; beach faces TOWARD a direction.
+  // Ideal: swellDirection ≈ beachFacingDeg (swell travels straight into the beach).
+  const swellAngleToBeach = Math.abs(input.swellDirection - input.beachFacingDeg)
   const alignment = swellAngleToBeach > 180 ? 360 - swellAngleToBeach : swellAngleToBeach
   if (alignment < 20) score += 10       // swell hits squarely
   else if (alignment < 45) score += 6   // slight angle — still good
