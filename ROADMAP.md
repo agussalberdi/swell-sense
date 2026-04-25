@@ -19,27 +19,29 @@
 
 ---
 
-## Phase 1 — Live Data Layer 🌊
+## Phase 1 — Live Data Layer ✅
 
 **Goal:** Replace mock data with real Stormglass API calls. The Vibe Score must be calculated server-side from actual ocean conditions.
 
-### 1.1 Environment & API Client
-- [ ] Add `STORMGLASS_API_KEY` to `.env.local` (and Vercel env vars)
-- [ ] Create `src/lib/stormglass.ts` — typed API client with `Promise.all` for parallel fetching of wave, weather, and tide endpoints
-- [ ] Add `src/lib/vibe-score.ts` — deterministic scoring function:
+### 1.1 Environment & API Client ✅
+- [x] Add `STORMGLASS_API_KEY` to `.env.local` (placeholder — real key to be added before go-live)
+- [x] Create `src/lib/stormglass.ts` — typed API client with `Promise.all` for parallel fetching of wave, weather, and tide endpoints
+- [x] Add `src/lib/vibe-score.ts` — deterministic scoring function:
   ```
   vibeScore(waveHeight, period, windSpeed, windDir, swellDir, tide) → 0–100
   ```
   Consider: wave height sweet spot (3–6ft = max points), offshore wind bonus, period bonus (>10s), tide multiplier
+- [x] Add `src/lib/config.ts` — `IS_MOCK_MODE` flag to protect free-tier quota during development
+- [x] Add raw Stormglass-format mock fixture in `stormglass.ts` (goes through same `transform()` path as live data)
 
-### 1.2 Server-Side Data Fetching
-- [ ] Convert `page.tsx` `SURF_DATA` constant to `async` fetch using `React.cache()` for per-request deduplication
-- [ ] Add `next.revalidate = 1800` (30-min ISR) — Stormglass free tier refreshes hourly
-- [ ] Create `src/app/loading.tsx` — full-page skeleton matching the dashboard layout
+### 1.2 Server-Side Data Fetching ✅
+- [x] Convert `page.tsx` `SURF_DATA` constant to `async` fetch using `React.cache()` for per-request deduplication
+- [x] Cache with `'use cache'` + `cacheLife('hours')` (Next.js 16 Data Cache, 1-hour TTL); `experimental.useCache: true` in `next.config.ts`
+- [x] Create `src/app/loading.tsx` — full-page skeleton matching the dashboard layout
 
-### 1.3 Location
-- [ ] Hardcode initial coordinates for Lower Trestles (`33.3822° N, 117.5897° W`)
-- [ ] Store as `SPOTS` constant in `src/lib/spots.ts` for future multi-spot support
+### 1.3 Location ✅
+- [x] Hardcode initial coordinates for Lower Trestles (`33.3822° N, 117.5897° W`)
+- [x] Store as `SPOTS` constant in `src/lib/spots.ts` for future multi-spot support
 
 **Key file:** `src/lib/stormglass.ts`
 **Stormglass docs:** https://docs.stormglass.io/#wave-forecast
@@ -198,4 +200,4 @@ return clamp(score, 0, 100)
 
 ---
 
-*Last updated: Phase 0 complete. Up next: Phase 1 — Live Data Layer.*
+*Last updated: Phase 1 complete. Up next: Phase 2 — AI Board Pick.*
