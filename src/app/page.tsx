@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import VibeGauge from '@/components/VibeGauge'
 import ForecastChart from '@/components/ForecastChart'
 import AIBriefing from '@/components/AIBriefing'
+import Logo from '@/components/ui/logo'
 import { getSurfData } from '@/lib/stormglass'
 import { generateBriefing } from '@/lib/briefing'
 import { DEFAULT_SPOT } from '@/lib/spots'
@@ -132,12 +133,7 @@ export default async function HomePage() {
 
         {/* ── App Header ───────────────────────────────────── */}
         <header className="flex items-center justify-between py-5">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl" aria-hidden>🌊</span>
-            <span className="text-lg font-bold tracking-tight" style={{ color: '#FFFFFF' }}>
-              SwellSense
-            </span>
-          </div>
+          <Logo />
           <div className="flex items-center gap-1.5 text-sm" style={{ color: '#94A3B8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
