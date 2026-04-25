@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
+/* ── SwellSense Design Tokens ──────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --surface-base: #0A192F;
+  --surface-card: rgba(16, 33, 62, 0.7);
+  --brand-primary: #00F5FF;
+  --brand-secondary: #7D26CD;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --glow-cyan: rgba(0, 245, 255, 0.4);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--surface-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-base);
+  color: var(--text-primary);
+}
+
+/* ── Animations ────────────────────────────────────────────── */
+@keyframes gauge-draw {
+  to {
+    stroke-dashoffset: var(--gauge-target-offset);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
