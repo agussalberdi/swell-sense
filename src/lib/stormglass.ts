@@ -306,7 +306,10 @@ const FETCH_HOURS = 168 // 7 days for the week strip
 
 async function fetchSurfDataRaw(spot: Spot): Promise<SurfData> {
   'use cache'
-  cacheLife('hours')
+  // 6-hour TTL: protects Stormglass free tier (10 req/day, 2 per call).
+  // 4 refreshes/day per spot = 8 API calls — safely within the 10 req limit.
+  // If quota is exceeded, the error handler below falls back to mock data.
+  cacheLife({ revalidate: 21_600, expire: 86_400 })
 
   if (IS_MOCK_MODE) {
     console.info('[SwellSense] Mock mode — no API request made.')
