@@ -148,7 +148,7 @@
 - [x] **Auth.js v5** (`next-auth@beta`) with Google provider — Google OAuth only for MVP
 - [x] **Neon Postgres** + **Drizzle ORM** — `users` (+ `userTier`), `accounts`, `sessions`, `verificationTokens`, `profiles`
 - [x] `userTier` column (`free` | `pro` | `team`) on `users` — monetisation hook, zero future schema changes needed
-- [x] `profiles` table — `homeBreakId`, `skillLevel`, `boards` (JSONB), `onboardingCompleted`
+- [x] `profiles` table — `homeBreakId`, `skillLevel`, `boards` (JSONB), `onboardingCompleted`, `unitSystem` (imperial | metric)
 - [x] `src/lib/auth.ts` — DrizzleAdapter with extended table map; session callback exposes `user.id` + `user.tier`
 - [x] `src/app/api/auth/[...nextauth]/route.ts` — Auth.js route handler
 - [x] `AuthButton.tsx` — avatar dropdown (My Profile / Sign out) when signed in; Google sign-in pill when not
@@ -157,7 +157,8 @@
 - [x] `generateBriefing()` accepts optional `userProfile` — quiver + skill level injected into prompt
 - [x] Protected `/profile` page (redirect to `/dashboard` if unauthenticated)
 - [x] `ProfileForm.tsx` — skill level selector, home break dropdown, quiver board picker
-- [x] `PATCH /api/profile` — upsert profile; sets `onboardingCompleted = true` once skill + quiver filled
+- [x] `PATCH /api/profile` — upsert profile; sets `onboardingCompleted = true` once skill + quiver filled; accepts `unitSystem`
+- [x] **Display units** — `profiles.unitSystem` for signed-in users; `ssr-units` cookie for guests; dashboard header `UnitToggle` + profile **Measurements** section; `getSurfData(spot, unitSystem)` with units threaded through charts
 - [ ] Add Google OAuth credentials + `POSTGRES_URL` to Vercel env vars (**requires manual setup — see below**)
 
 ---

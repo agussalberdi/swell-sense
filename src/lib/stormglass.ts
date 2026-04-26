@@ -2,6 +2,8 @@ import { cache } from 'react'
 import { cacheLife } from 'next/cache'
 import type { Spot } from './spots'
 import { IS_MOCK_MODE } from './config'
+import type { UnitSystem } from './units'
+import { DEFAULT_UNIT_SYSTEM } from './units'
 import {
   calcVibeScore,
   classifyWind,
@@ -26,7 +28,7 @@ export interface SurfData {
   boardPick: string
   forecast: { hour: string; height: number }[]
   // ── Phase 4 additions ──────────────────────────────────────────────────
-  weekForecast: { date: string; vibeScore: number; maxHeightFt: number }[]
+  weekForecast: { date: string; vibeScore: number; maxHeightLabel: string }[]
   tidalCurve: { hour: number; heightM: number }[]
   windRoseData: { direction: number; speed: number }[]
   swellWindow: { startHour: string; endHour: string; score: number } | null
@@ -79,12 +81,30 @@ function best(src: SGSourceMap | undefined, fallback = 0): number {
   return src.sg ?? src.noaa ?? src.meto ?? src.dwd ?? src.icon ?? fallback
 }
 
-function fmtHeightRange(metres: number): string {
+function fmtHeightRange(metres: number, unitSystem: UnitSystem): string {
+  if (unitSystem === 'metric') {
+    return `${metres.toFixed(1)} m`
+  }
   const ft = metres * 3.28084
   const lo = Math.floor(ft)
   const hi = lo + 1
   if (ft < 1) return `${ft.toFixed(1)} ft`
   return `${lo}–${hi} ft`
+}
+
+function formatPeakSwell(peakHeightM: number, period: number, unitSystem: UnitSystem): string {
+  if (unitSystem === 'metric') {
+    return `${peakHeightM.toFixed(1)}m @ ${period}s`
+  }
+  return `${(peakHeightM * 3.28084).toFixed(1)}ft @ ${period}s`
+}
+
+function formatWindSpeed(windSpeedMS: number, unitSystem: UnitSystem): string {
+  if (unitSystem === 'metric') {
+    const kmh = windSpeedMS * 3.6
+    return `${Math.round(kmh)} km/h`
+  }
+  return `${Math.round(windSpeedMS * 2.23694)} mph`
 }
 
 function compassLabel(deg: number): string {
@@ -138,6 +158,7 @@ function transform(
   weather: SGWeatherResponse,
   tideData: SGTideExtreme[],
   spot: Spot,
+  unitSystem: UnitSystem = DEFAULT_UNIT_SYSTEM,
 ): SurfData {
   const hours = weather.hours
   const now = hours[0]
@@ -150,7 +171,6 @@ function transform(
   const waterTempC   = best(now.waterTemperature, 18)
 
   const waveHeightFt = waveHeightM * 3.28084
-  const windSpeedMph = windSpeedMS * 2.23694
   const waterTempF   = Math.round(waterTempC * 9 / 5 + 32)
 
   const windType = classifyWind(windSpeedMS, windDir, spot.facingDeg)
@@ -169,20 +189,23 @@ function transform(
     beachFacingDeg: spot.facingDeg,
   })
 
-  // 5-point 12-h forecast at 0 / 3 / 6 / 9 / 12 h
+  // 5-point 12-h forecast at 0 / 3 / 6 / 9 / 12 h — `height` in feet (imperial) or metres (metric)
   const forecast = [0, 3, 6, 9, 12].map((idx, i) => {
     const h = hours[idx] ?? hours[hours.length - 1]
+    const m = best(h.waveHeight)
     return {
-      hour: i === 0 ? 'Now' : `${idx}h`,
-      height: parseFloat((best(h.waveHeight) * 3.28084).toFixed(1)),
+      hour:   i === 0 ? 'Now' : `${idx}h`,
+      height: unitSystem === 'metric'
+        ? parseFloat(m.toFixed(2))
+        : parseFloat((m * 3.28084).toFixed(1)),
     }
   })
 
   // Peak swell in the 12-h window
   const first13 = hours.slice(0, 13)
-  const peakHour   = first13.reduce((a, b) => best(a.waveHeight) >= best(b.waveHeight) ? a : b)
-  const peakFt     = (best(peakHour.waveHeight) * 3.28084).toFixed(1)
-  const peakPeriod = Math.round(best(peakHour.wavePeriod))
+  const peakHour     = first13.reduce((a, b) => best(a.waveHeight) >= best(b.waveHeight) ? a : b)
+  const peakHeightM  = best(peakHour.waveHeight)
+  const peakPeriod   = Math.round(best(peakHour.wavePeriod))
 
   // Next tide extreme
   const nextTide = tideData[0]
@@ -200,7 +223,9 @@ function transform(
   // ── Phase 4: 7-day forecast ─────────────────────────────────────────────
   const weekForecast: SurfData['weekForecast'] = Array.from({ length: 7 }, (_, day) => {
     const dayHours = hours.slice(day * 24, (day + 1) * 24)
-    if (!dayHours.length) return { date: '', vibeScore: 0, maxHeightFt: 0 }
+    if (!dayHours.length) {
+      return { date: '', vibeScore: 0, maxHeightLabel: '—' }
+    }
     const maxH = Math.max(...dayHours.map((h) => best(h.waveHeight)))
     const midHour = dayHours[Math.floor(dayHours.length / 2)]
     const dayScore = calcVibeScore({
@@ -215,10 +240,13 @@ function transform(
       weekday: 'short',
       timeZone: 'UTC',
     })
+    const maxHeightLabel = unitSystem === 'metric'
+      ? `${maxH.toFixed(1)}m`
+      : `${(maxH * 3.28084).toFixed(1)}ft`
     return {
       date,
       vibeScore: dayScore,
-      maxHeightFt: parseFloat((maxH * 3.28084).toFixed(1)),
+      maxHeightLabel,
     }
   })
 
@@ -269,16 +297,20 @@ function transform(
     }
   }
 
+  const waterTempStr = unitSystem === 'metric'
+    ? `${Math.round(waterTempC)}°C`
+    : `${waterTempF}°F`
+
   return {
     location:     spot.name,
     vibeScore,
     description:  sessionDescription(vibeScore, waveHeightFt, wavePeriod, windType),
-    waveHeight:   fmtHeightRange(waveHeightM),
+    waveHeight:   fmtHeightRange(waveHeightM, unitSystem),
     period:       `${Math.round(wavePeriod)} s`,
-    peakSwell:    `${peakFt}ft @ ${peakPeriod}s`,
-    wind:         { speed: `${Math.round(windSpeedMph)} mph`, direction: windLabel },
+    peakSwell:    formatPeakSwell(peakHeightM, peakPeriod, unitSystem),
+    wind:         { speed: formatWindSpeed(windSpeedMS, unitSystem), direction: windLabel },
     tide:         tideLabel,
-    waterTemp:    { temp: `${waterTempF}°F`, gear: gearFromTemp(waterTempC) },
+    waterTemp:    { temp: waterTempStr, gear: gearFromTemp(waterTempC) },
     boardPick:    boardPick(waveHeightFt, wavePeriod),
     forecast,
     weekForecast,
@@ -304,7 +336,10 @@ const SG_PARAMS = [
 ].join(',')
 const FETCH_HOURS = 168 // 7 days for the week strip
 
-async function fetchSurfDataRaw(spot: Spot): Promise<SurfData> {
+async function fetchSurfDataRaw(
+  spot: Spot,
+  unitSystem: UnitSystem = DEFAULT_UNIT_SYSTEM,
+): Promise<SurfData> {
   'use cache'
   // 6-hour TTL: protects Stormglass free tier (10 req/day, 2 per call).
   // 4 refreshes/day per spot = 8 API calls — safely within the 10 req limit.
@@ -313,13 +348,13 @@ async function fetchSurfDataRaw(spot: Spot): Promise<SurfData> {
 
   if (IS_MOCK_MODE) {
     console.info('[SwellSense] Mock mode — no API request made.')
-    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot)
+    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot, unitSystem)
   }
 
   const apiKey = process.env.STORMGLASS_API_KEY
   if (!apiKey || apiKey === 'your_api_key_here') {
     console.warn('[SwellSense] STORMGLASS_API_KEY not set — returning mock data.')
-    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot)
+    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot, unitSystem)
   }
 
   const now   = new Date()
@@ -338,22 +373,23 @@ async function fetchSurfDataRaw(spot: Spot): Promise<SurfData> {
 
     if (!weatherRes.ok) {
       console.error(`[SwellSense] Weather fetch ${weatherRes.status} — falling back to mock.`)
-      return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot)
+      return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot, unitSystem)
     }
 
     const weather: SGWeatherResponse = await weatherRes.json()
     const tide: SGTideResponse = tideRes.ok ? await tideRes.json() : { data: [] }
 
-    return transform(weather, tide.data, spot)
+    return transform(weather, tide.data, spot, unitSystem)
   } catch (err) {
     console.error('[SwellSense] Fetch error — falling back to mock.', err)
-    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot)
+    return transform(MOCK_SG_WEATHER, MOCK_SG_TIDES, spot, unitSystem)
   }
 }
 
 /**
  * getSurfData — the single public entry point.
  * React.cache() deduplicates within the same render pass.
- * 'use cache' inside fetchSurfDataRaw handles cross-request Data Cache.
+ * 'use cache' inside fetchSurfDataRaw handles cross-request Data Cache;
+ * `unitSystem` is part of the cache key.
  */
 export const getSurfData = cache(fetchSurfDataRaw)

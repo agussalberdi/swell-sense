@@ -77,7 +77,7 @@ export default function WeekStrip({ weekForecast }: Props) {
 
             {/* Max wave height */}
             <span className="text-xs" style={{ color: '#64748B' }}>
-              {day.maxHeightFt}ft
+              {day.maxHeightLabel}
             </span>
           </div>
         )

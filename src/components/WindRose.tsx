@@ -1,6 +1,7 @@
 'use client'
 
 import type { SurfData } from '@/lib/stormglass'
+import type { UnitSystem } from '@/lib/units'
 
 // ---------------------------------------------------------------------------
 // WindRose — SVG polar chart showing 24-h wind direction/speed distribution.
@@ -42,13 +43,19 @@ function sectorPath(dirIdx: number, innerR: number, outerR: number): string {
   ].join(' ')
 }
 
+function windSpeedFromMs(speedMs: number, unitSystem: UnitSystem): string {
+  if (unitSystem === 'metric') return `${Math.round(speedMs * 3.6)} km/h`
+  return `${Math.round(speedMs * 2.236936)} mph`
+}
+
 interface Props {
   windRoseData: SurfData['windRoseData']
   /** Beach facing direction (degrees) — used to identify offshore sectors. */
   facingDeg: number
+  unitSystem: UnitSystem
 }
 
-export default function WindRose({ windRoseData, facingDeg }: Props) {
+export default function WindRose({ windRoseData, facingDeg, unitSystem }: Props) {
   // Aggregate: average speed per 45° sector
   const sectorSpeeds = Array<number>(8).fill(0)
   const sectorCounts = Array<number>(8).fill(0)
@@ -150,20 +157,25 @@ export default function WindRose({ windRoseData, facingDeg }: Props) {
       </svg>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs" style={{ color: '#64748B' }}>
-        <span className="flex items-center gap-1.5">
-          <span
-            className="inline-block w-2.5 h-2.5 rounded-sm"
-            style={{ background: 'rgba(0,245,255,0.55)' }}
-          />
-          Offshore
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span
-            className="inline-block w-2.5 h-2.5 rounded-sm"
-            style={{ background: 'rgba(148,163,184,0.25)' }}
-          />
-          Other
+      <div className="flex flex-col items-center gap-1.5 text-xs" style={{ color: '#64748B' }}>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-sm"
+              style={{ background: 'rgba(0,245,255,0.55)' }}
+            />
+            Offshore
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-sm"
+              style={{ background: 'rgba(148,163,184,0.25)' }}
+            />
+            Other
+          </span>
+        </div>
+        <span className="font-mono text-[10px]" style={{ color: '#475569' }}>
+          max {windSpeedFromMs(maxSpeed, unitSystem)}
         </span>
       </div>
     </div>

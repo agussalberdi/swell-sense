@@ -1,11 +1,13 @@
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import VibeGauge from '@/components/VibeGauge'
 import ForecastChart from '@/components/ForecastChart'
 import AIBriefing from '@/components/AIBriefing'
 import Logo from '@/components/ui/logo'
 import SpotSelector from '@/components/SpotSelector'
+import UnitToggle from '@/components/UnitToggle'
 import WeekStrip from '@/components/WeekStrip'
 import TidalChart from '@/components/TidalChart'
 import WindRose from '@/components/WindRose'
@@ -18,6 +20,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { profiles } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { UNITS_COOKIE, resolveUnitSystem } from '@/lib/units'
 
 // Caching is handled by 'use cache' + cacheLife('hours') inside getSurfData().
 // With dynamicIO: true, this page is rendered dynamically per-request while
@@ -140,15 +143,13 @@ export default async function DashboardPage({
   const params = await searchParams
   const spot = resolveSpot(params)
 
-  // Session + profile are fetched in parallel with surf data
-  const [data, session] = await Promise.all([
-    getSurfData(spot),
-    auth(),
-  ])
-
-  const profile = session?.user?.id
+  const session     = await auth()
+  const cookieStore = await cookies()
+  const profile     = session?.user?.id
     ? await db.query.profiles.findFirst({ where: eq(profiles.userId, session.user.id) }) ?? null
     : null
+  const unitSystem  = resolveUnitSystem(profile, cookieStore.get(UNITS_COOKIE)?.value)
+  const data        = await getSurfData(spot, unitSystem)
 
   // generateBriefing is cached for 1 h; falls back to data.boardPick without an OpenAI key.
   const briefingText = await generateBriefing(data, spot, profile ?? undefined)
@@ -168,6 +169,7 @@ export default async function DashboardPage({
           {/* Top nav — tablet + desktop only */}
           <DashboardNav variant="top" />
           <div className="flex items-center gap-2">
+            <UnitToggle value={unitSystem} />
             <Suspense fallback={
               <div className="h-7 w-36 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
             }>
@@ -243,7 +245,11 @@ export default async function DashboardPage({
             <span className="text-xs font-mono" style={{ color: '#94A3B8' }}>Primary</span>
           </div>
           <Suspense fallback={<ChartSkeleton />}>
-            <ForecastChart data={data.forecast} peakSwell={data.peakSwell} />
+            <ForecastChart
+              data={data.forecast}
+              peakSwell={data.peakSwell}
+              unitSystem={unitSystem}
+            />
           </Suspense>
         </GlassCard>
 
@@ -290,7 +296,7 @@ export default async function DashboardPage({
             <span className="text-xs font-mono" style={{ color: '#94A3B8' }}>24 h</span>
           </div>
           <Suspense fallback={<ChartSkeleton />}>
-            <TidalChart tidalCurve={data.tidalCurve} />
+            <TidalChart tidalCurve={data.tidalCurve} unitSystem={unitSystem} />
           </Suspense>
         </GlassCard>
 
@@ -304,7 +310,11 @@ export default async function DashboardPage({
             <Suspense fallback={
               <div className="w-20 h-20 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
             }>
-              <WindRose windRoseData={data.windRoseData} facingDeg={spot.facingDeg} />
+              <WindRose
+                windRoseData={data.windRoseData}
+                facingDeg={spot.facingDeg}
+                unitSystem={unitSystem}
+              />
             </Suspense>
           </GlassCard>
 

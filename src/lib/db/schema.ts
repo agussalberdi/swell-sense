@@ -16,6 +16,8 @@ import type { AdapterAccountType } from 'next-auth/adapters'
 // ---------------------------------------------------------------------------
 export const userTierEnum = pgEnum('user_tier', ['free', 'pro', 'team'])
 
+export const unitSystemEnum = pgEnum('unit_system', ['imperial', 'metric'])
+
 // ---------------------------------------------------------------------------
 // Auth.js required tables (extended with userTier)
 // ---------------------------------------------------------------------------
@@ -80,6 +82,7 @@ export const profiles = pgTable('profile', {
   skillLevel:          text('skillLevel'),
   boards:              jsonb('boards').$type<Board[]>().default([]),
   onboardingCompleted: boolean('onboardingCompleted').notNull().default(false),
+  unitSystem:          unitSystemEnum('unit_system').notNull().default('imperial'),
   updatedAt:           timestamp('updatedAt', { mode: 'date' }).$onUpdateFn(() => new Date()),
 })
 

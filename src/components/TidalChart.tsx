@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { SurfData } from '@/lib/stormglass'
+import type { UnitSystem } from '@/lib/units'
 
 // ---------------------------------------------------------------------------
 // TidalChart — SVG sea-level curve for the next 24 hours.
@@ -42,11 +43,18 @@ function buildPath(
   return d
 }
 
-interface Props {
-  tidalCurve: SurfData['tidalCurve']
+function formatTideHeight(heightM: number, unitSystem: UnitSystem): string {
+  if (unitSystem === 'metric') return `${heightM.toFixed(2)}m`
+  const ft = heightM * 3.28084
+  return `${ft.toFixed(1)}ft`
 }
 
-export default function TidalChart({ tidalCurve }: Props) {
+interface Props {
+  tidalCurve: SurfData['tidalCurve']
+  unitSystem: UnitSystem
+}
+
+export default function TidalChart({ tidalCurve, unitSystem }: Props) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
 
   if (!tidalCurve.length) return null
@@ -138,7 +146,7 @@ export default function TidalChart({ tidalCurve }: Props) {
                 fill={isHigh ? '#00F5FF' : '#94A3B8'}
                 fontFamily="JetBrains Mono, monospace"
               >
-                {p.heightM.toFixed(1)}m
+                {formatTideHeight(p.heightM, unitSystem)}
               </text>
             </g>
           )
@@ -209,7 +217,7 @@ export default function TidalChart({ tidalCurve }: Props) {
           transform={`rotate(-90, ${PAD_L - 14}, ${PAD_T + (H - PAD_T - PAD_B) / 2})`}
           fontFamily="JetBrains Mono, monospace"
         >
-          m
+          {unitSystem === 'metric' ? 'm' : 'ft'}
         </text>
       </svg>
 
@@ -224,7 +232,7 @@ export default function TidalChart({ tidalCurve }: Props) {
             fontFamily: 'JetBrains Mono, monospace',
           }}
         >
-          {hovered.hour === 0 ? 'Now' : `+${hovered.hour}h`} · {hovered.heightM.toFixed(2)}m
+          {hovered.hour === 0 ? 'Now' : `+${hovered.hour}h`} · {formatTideHeight(hovered.heightM, unitSystem)}
         </div>
       )}
     </div>

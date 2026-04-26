@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { Profile, Board } from '@/lib/db/schema'
 import { SPOTS } from '@/lib/spots'
+import { UNITS_COOKIE, type UnitSystem } from '@/lib/units'
 
 type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'pro'
 type BoardType  = Board['type']
@@ -35,7 +36,8 @@ export default function ProfileForm({ profile }: { profile: Profile | null }) {
   const [boards, setBoards]           = useState<BoardType[]>(
     profile?.boards?.map((b) => b.type) ?? [],
   )
-  const [status, setStatus]           = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [unitSystem, setUnitSystem]  = useState<UnitSystem>(profile?.unitSystem ?? 'imperial')
+  const [status, setStatus]          = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   function toggleBoard(type: BoardType) {
     setBoards((prev) =>
@@ -55,9 +57,12 @@ export default function ProfileForm({ profile }: { profile: Profile | null }) {
           homeBreakId:         homeBreakId || null,
           boards:              boards.map((type) => ({ type })),
           onboardingCompleted: !!skillLevel && boards.length > 0,
+          unitSystem,
         }),
       })
       if (!res.ok) throw new Error('Failed')
+      const year = 60 * 60 * 24 * 400
+      document.cookie = `${UNITS_COOKIE}=${unitSystem}; path=/; max-age=${year}; SameSite=Lax`
       setStatus('saved')
       setTimeout(() => setStatus('idle'), 2500)
     } catch {
@@ -103,6 +108,50 @@ export default function ProfileForm({ profile }: { profile: Profile | null }) {
                   {label}
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>{desc}</p>
+              </button>
+            )
+          })}
+        </div>
+      </fieldset>
+
+      {/* ── Measurements (units) ────────────────────────── */}
+      <fieldset>
+        <legend className="text-xs font-semibold mb-2" style={{ color: '#94A3B8' }}>
+          MEASUREMENTS
+        </legend>
+        <p className="text-xs mb-3" style={{ color: '#64748B' }}>
+          Dashboard uses these units for wave height, wind, and temperature.
+        </p>
+        <div
+          className="inline-flex rounded-full p-0.5"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border:     '1px solid rgba(255,255,255,0.1)',
+          }}
+          role="group"
+        >
+          {(
+            [
+              { value: 'imperial' as const, label: 'Imperial', hint: 'ft · mph · °F' },
+              { value: 'metric' as const, label: 'Metric', hint: 'm · km/h · °C' },
+            ] as const
+          ).map(({ value, label, hint }) => {
+            const active = unitSystem === value
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setUnitSystem(value)}
+                className="rounded-full px-4 py-2 text-left transition-all min-w-[7rem]"
+                style={{
+                  background: active ? 'rgba(0,245,255,0.12)' : 'transparent',
+                  border:     active ? '1px solid rgba(0,245,255,0.35)' : '1px solid transparent',
+                }}
+              >
+                <p className="text-sm font-semibold" style={{ color: active ? '#00F5FF' : '#FFFFFF' }}>
+                  {label}
+                </p>
+                <p className="text-[10px] mt-0.5 font-mono" style={{ color: '#64748B' }}>{hint}</p>
               </button>
             )
           })}

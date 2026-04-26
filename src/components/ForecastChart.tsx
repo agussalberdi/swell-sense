@@ -7,19 +7,32 @@ export interface ForecastPoint {
   height: number
 }
 
+import type { UnitSystem } from '@/lib/units'
+
 interface ForecastChartProps {
   data: ReadonlyArray<ForecastPoint>
   peakSwell: string
+  unitSystem: UnitSystem
 }
 
 const W = 280
 const H = 76
 const PAD_X = 12
-const Y_MIN = 1.5
-const Y_MAX = 6.5
 
-function toY(h: number): number {
-  return H - ((h - Y_MIN) / (Y_MAX - Y_MIN)) * H
+function yRange(
+  data: ReadonlyArray<ForecastPoint>,
+): { yMin: number; yMax: number } {
+  if (!data.length) return { yMin: 0, yMax: 1 }
+  const vals   = data.map((d) => d.height)
+  const hMin   = Math.min(...vals)
+  const hMax   = Math.max(...vals)
+  const spread = hMax - hMin || 0.1
+  const pad    = Math.max(0.15 * spread, 0.05 * (hMax || 1))
+  return { yMin: hMin - pad, yMax: hMax + pad }
+}
+
+function toY(h: number, yMin: number, yMax: number): number {
+  return H - ((h - yMin) / (yMax - yMin)) * H
 }
 
 function buildSmoothPath(pts: { x: number; y: number }[]): string {
@@ -34,13 +47,15 @@ function buildSmoothPath(pts: { x: number; y: number }[]): string {
   return d
 }
 
-export default function ForecastChart({ data, peakSwell }: ForecastChartProps) {
+export default function ForecastChart({ data, peakSwell, unitSystem }: ForecastChartProps) {
   const [hovered, setHovered] = useState<number | null>(null)
+  const { yMin, yMax }         = yRange(data)
+  const heightSuffix           = unitSystem === 'metric' ? 'm' : 'ft'
 
-  const xStep = (W - PAD_X * 2) / (data.length - 1)
+  const xStep = data.length > 1 ? (W - PAD_X * 2) / (data.length - 1) : 0
   const pts = data.map((d, i) => ({
     x: PAD_X + i * xStep,
-    y: toY(d.height),
+    y: toY(d.height, yMin, yMax),
   }))
 
   const linePath = buildSmoothPath(pts)
@@ -102,7 +117,7 @@ export default function ForecastChart({ data, peakSwell }: ForecastChartProps) {
                 fontWeight="600"
                 fontFamily="'JetBrains Mono', monospace"
               >
-                {data[i].height}ft
+                {data[i].height}{heightSuffix}
               </text>
             )}
           </g>
