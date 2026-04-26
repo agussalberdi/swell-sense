@@ -102,6 +102,21 @@
 
 ---
 
+## Phase 4.5 — Launch Page ✅
+
+**Goal:** A high-conversion landing page at `/launch` — fully static, no API keys, deployable immediately.
+
+- [x] Install `framer-motion`
+- [x] `src/app/launch/layout.tsx` — launch-specific metadata (`<title>`, OG tags)
+- [x] `src/components/launch/WaveBackground.tsx` — `'use client'` Framer Motion parallax layer (two SVG wave shapes, scroll-linked `y` + `opacity`)
+- [x] `src/components/launch/EmailForm.tsx` — `'use client'` email capture, 48px tap target button, glow on hover
+- [x] `src/app/launch/page.tsx` — RSC wiring all sections: Logo → Hero headline → Dashboard SVG mockup → Value prop strip → Email form → Featured Spots grid
+- [x] Featured Spots pills link to `/?id=<spotId>` for one-tap live data access
+
+**Key files:** `src/app/launch/page.tsx`, `src/components/launch/`
+
+---
+
 ## Phase 5 — Push Notifications & Alerts 🔔
 
 **Goal:** SwellSense tells you when conditions hit your threshold — without you checking.
