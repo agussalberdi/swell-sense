@@ -16,4 +16,4 @@
  *   → For free tier, change cacheLife to { revalidate: 21_600 } (6 h)
  *     in src/lib/stormglass.ts to stay safely within quota.
  */
-export const IS_MOCK_MODE = true
+export const IS_MOCK_MODE = true;
