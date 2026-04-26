@@ -34,8 +34,22 @@ export default function Loading() {
         {/* ── Header ───────────────────────────────────────── */}
         <div className="flex items-center justify-between py-5">
           <Bone className="h-6 w-32" />
-          <Bone className="h-4 w-28" />
+          <Bone className="h-8 w-36 rounded-full" />
         </div>
+
+        {/* ── Spot chips ───────────────────────────────────── */}
+        <div className="flex gap-2 mb-4 overflow-hidden">
+          {[80, 100, 72, 90, 68, 85, 76].map((w) => (
+            <div
+              key={w}
+              className="h-7 flex-shrink-0 rounded-full animate-pulse"
+              style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
+            />
+          ))}
+        </div>
+
+        {/* ── Location badge ───────────────────────────────── */}
+        <Bone className="h-4 w-36 mb-4" />
 
         {/* ── Vibe Score card ──────────────────────────────── */}
         <GlassCard className="p-6 mb-4 flex flex-col items-center gap-4">
@@ -93,6 +107,49 @@ export default function Loading() {
               <Bone className="h-3 w-12" />
             </GlassCard>
           </div>
+        </div>
+
+        {/* ── 7-Day Outlook ────────────────────────────────── */}
+        <GlassCard className="p-5 mb-4 space-y-3">
+          <Bone className="h-4 w-28" />
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{ width: 64 }}>
+                <Bone className="h-3 w-10" />
+                <Bone className="h-12 w-4 rounded-full" />
+                <Bone className="h-3 w-6" />
+                <Bone className="h-3 w-8" />
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        {/* ── Tidal Curve ───────────────────────────────────── */}
+        <GlassCard className="p-5 mb-4 space-y-3">
+          <div className="flex justify-between">
+            <Bone className="h-4 w-28" />
+            <Bone className="h-4 w-8" />
+          </div>
+          <Bone className="h-24 w-full" />
+        </GlassCard>
+
+        {/* ── Wind Rose + Peak Window ───────────────────────── */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <GlassCard className="p-4 flex flex-col items-center gap-3">
+            <Bone className="h-3 w-full" />
+            <div
+              className="rounded-full animate-pulse"
+              style={{ width: 100, height: 100, background: 'rgba(255,255,255,0.06)' }}
+            />
+          </GlassCard>
+          <GlassCard className="p-4 space-y-3">
+            <Bone className="h-3 w-20" />
+            <Bone className="h-20 w-full rounded-lg" />
+            <div className="flex justify-between">
+              <Bone className="h-3 w-10" />
+              <Bone className="h-6 w-8" />
+            </div>
+          </GlassCard>
         </div>
 
         {/* ── AI board pick ────────────────────────────────── */}
