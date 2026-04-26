@@ -10,7 +10,7 @@ export interface Spot {
 }
 
 export const SPOTS: Record<string, Spot> = {
-  // ── Americas ──────────────────────────────────────────────────────────────
+  // ── North America ─────────────────────────────────────────────────────────
   'lower-trestles': {
     id: 'lower-trestles',
     name: 'Lower Trestles',
@@ -27,6 +27,40 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: -7,
     facingDeg: 270,
   },
+  'pipeline': {
+    id: 'pipeline',
+    name: 'Pipeline',
+    lat: 21.6644,
+    lng: -158.0539,
+    utcOffset: -10,
+    facingDeg: 315,
+  },
+  'sunset-beach': {
+    id: 'sunset-beach',
+    name: 'Sunset Beach',
+    lat: 21.6783,
+    lng: -158.0469,
+    utcOffset: -10,
+    facingDeg: 0,
+  },
+  'puerto-escondido': {
+    id: 'puerto-escondido',
+    name: 'Puerto Escondido',
+    lat: 15.8647,
+    lng: -97.0500,
+    utcOffset: -6,
+    facingDeg: 180,
+  },
+  'tofino': {
+    id: 'tofino',
+    name: 'Tofino',
+    lat: 49.1530,
+    lng: -125.9067,
+    utcOffset: -7,
+    facingDeg: 270,
+  },
+
+  // ── South America ─────────────────────────────────────────────────────────
   'chicama': {
     id: 'chicama',
     name: 'Chicama',
@@ -42,6 +76,30 @@ export const SPOTS: Record<string, Spot> = {
     lng: -72.0133,
     utcOffset: -3,
     facingDeg: 270,
+  },
+  'pichilemu': {
+    id: 'pichilemu',
+    name: 'Pichilemu',
+    lat: -34.3873,
+    lng: -72.0036,
+    utcOffset: -3,
+    facingDeg: 270,
+  },
+  'mar-del-plata': {
+    id: 'mar-del-plata',
+    name: 'Mar del Plata',
+    lat: -38.0055,
+    lng: -57.5426,
+    utcOffset: -3,
+    facingDeg: 90,
+  },
+  'florianopolis': {
+    id: 'florianopolis',
+    name: 'Florianópolis',
+    lat: -27.7647,
+    lng: -48.5044,
+    utcOffset: -3,
+    facingDeg: 90,
   },
 
   // ── Europe ────────────────────────────────────────────────────────────────
@@ -69,6 +127,14 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: 1,
     facingDeg: 270,
   },
+  'ericeira': {
+    id: 'ericeira',
+    name: 'Ericeira',
+    lat: 38.9619,
+    lng: -9.4147,
+    utcOffset: 1,
+    facingDeg: 315,
+  },
   'anchor-point': {
     id: 'anchor-point',
     name: 'Anchor Point',
@@ -77,11 +143,19 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: 1,
     facingDeg: 315,
   },
+  'fistral': {
+    id: 'fistral',
+    name: 'Fistral Beach',
+    lat: 50.4085,
+    lng: -5.1042,
+    utcOffset: 1,
+    facingDeg: 270,
+  },
 
   // ── Africa ────────────────────────────────────────────────────────────────
   'jeffreys-bay': {
     id: 'jeffreys-bay',
-    name: "Jeffreys Bay",
+    name: 'Jeffreys Bay',
     lat: -34.0527,
     lng: 24.9302,
     utcOffset: 2,
@@ -95,24 +169,16 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: 2,
     facingDeg: 180,
   },
+  'durban': {
+    id: 'durban',
+    name: 'Durban',
+    lat: -29.8587,
+    lng: 31.0218,
+    utcOffset: 2,
+    facingDeg: 90,
+  },
 
-  // ── Pacific / Indonesia ───────────────────────────────────────────────────
-  'pipeline': {
-    id: 'pipeline',
-    name: 'Pipeline',
-    lat: 21.6644,
-    lng: -158.0539,
-    utcOffset: -10,
-    facingDeg: 315,
-  },
-  'cloudbreak': {
-    id: 'cloudbreak',
-    name: 'Cloudbreak',
-    lat: -17.8636,
-    lng: 177.1533,
-    utcOffset: 12,
-    facingDeg: 225,
-  },
+  // ── Australia ─────────────────────────────────────────────────────────────
   'snapper-rocks': {
     id: 'snapper-rocks',
     name: 'Snapper Rocks',
@@ -121,14 +187,32 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: 10,
     facingDeg: 90,
   },
-  'supertubes': {
-    id: 'supertubes',
-    name: 'Supertubes',
-    lat: -34.0488,
-    lng: 24.9299,
-    utcOffset: 2,
+  'bells-beach': {
+    id: 'bells-beach',
+    name: 'Bells Beach',
+    lat: -38.3688,
+    lng: 144.2833,
+    utcOffset: 10,
+    facingDeg: 180,
+  },
+  'margaret-river': {
+    id: 'margaret-river',
+    name: 'Margaret River',
+    lat: -33.9526,
+    lng: 114.9819,
+    utcOffset: 8,
+    facingDeg: 225,
+  },
+  'noosa': {
+    id: 'noosa',
+    name: 'Noosa',
+    lat: -26.3898,
+    lng: 153.0899,
+    utcOffset: 10,
     facingDeg: 90,
   },
+
+  // ── Indonesia & Pacific ───────────────────────────────────────────────────
   'uluwatu': {
     id: 'uluwatu',
     name: 'Uluwatu',
@@ -161,8 +245,14 @@ export const SPOTS: Record<string, Spot> = {
     utcOffset: 8,
     facingDeg: 180,
   },
-
-  // ── Indian Ocean ──────────────────────────────────────────────────────────
+  'cloudbreak': {
+    id: 'cloudbreak',
+    name: 'Cloudbreak',
+    lat: -17.8636,
+    lng: 177.1533,
+    utcOffset: 12,
+    facingDeg: 225,
+  },
   'teahupoo': {
     id: 'teahupoo',
     name: "Teahupo'o",
@@ -178,6 +268,22 @@ export const SPOTS: Record<string, Spot> = {
     lng: 114.3500,
     utcOffset: 8,
     facingDeg: 180,
+  },
+  'siargao': {
+    id: 'siargao',
+    name: 'Siargao',
+    lat: 9.8603,
+    lng: 126.0499,
+    utcOffset: 8,
+    facingDeg: 90,
+  },
+  'supertubes': {
+    id: 'supertubes',
+    name: 'Supertubes',
+    lat: -34.0488,
+    lng: 24.9299,
+    utcOffset: 2,
+    facingDeg: 90,
   },
 }
 

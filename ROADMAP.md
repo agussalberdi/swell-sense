@@ -70,7 +70,7 @@
 
 ---
 
-## Phase 3 — Multi-Spot & Location Search ✅
+## Phase 3 — Multi-Spot & Location Search ✅ (expanded)
 
 **Goal:** Let the user pick any surf spot in the world.
 
@@ -84,8 +84,8 @@
 - [x] Add a "Favourite Spots" list persisted in `localStorage` (versioned schema, `v1`) via `src/lib/favourites.ts`
 
 ### 3.3 Spot Library ✅
-- [x] Pre-seed `src/lib/spots.ts` with 20 iconic spots (Pipeline, Jeffreys Bay, Hossegor, Uluwatu, etc.) with coordinates + UTC offset
-- [x] Render as quick-select chips in the header (`SpotChips.tsx`) — favourites sorted to front, heart toggle
+- [x] Pre-seed `src/lib/spots.ts` with 35 iconic spots across all continents (including Mar del Plata, Puerto Escondido, Bells Beach, Siargao, Ericeira, Tofino, etc.)
+- [x] `SpotSelector.tsx` — single minimal dropdown in the header replacing SpotChips + SpotSearch; presets + Nominatim geocoding for any custom location worldwide
 
 ---
 

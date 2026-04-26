@@ -5,8 +5,7 @@ import VibeGauge from '@/components/VibeGauge'
 import ForecastChart from '@/components/ForecastChart'
 import AIBriefing from '@/components/AIBriefing'
 import Logo from '@/components/ui/logo'
-import SpotChips from '@/components/SpotChips'
-import SpotSearch from '@/components/SpotSearch'
+import SpotSelector from '@/components/SpotSelector'
 import WeekStrip from '@/components/WeekStrip'
 import TidalChart from '@/components/TidalChart'
 import WindRose from '@/components/WindRose'
@@ -169,29 +168,14 @@ export default async function DashboardPage({
           {/* Top nav — tablet + desktop only */}
           <DashboardNav variant="top" />
           <div className="flex items-center gap-2">
-            <Suspense fallback={null}>
-              <SpotSearch />
+            <Suspense fallback={
+              <div className="h-7 w-36 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            }>
+              <SpotSelector />
             </Suspense>
             <AuthButton />
           </div>
         </header>
-
-        {/* ── Spot Chips ───────────────────────────────────── */}
-        <div id="spots" className="mb-4 -mx-1">
-          <Suspense fallback={
-            <div className="flex gap-2 overflow-hidden">
-              {[80, 100, 72, 90, 68].map((w) => (
-                <div
-                  key={w}
-                  className="h-7 rounded-full flex-shrink-0 animate-pulse"
-                  style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
-                />
-              ))}
-            </div>
-          }>
-            <SpotChips />
-          </Suspense>
-        </div>
 
         {/* ── Active location badge ─────────────────────────── */}
         <div className="flex items-center gap-1.5 text-sm mb-4" style={{ color: '#94A3B8' }}>
