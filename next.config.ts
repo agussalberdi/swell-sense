@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
     // Renamed from dynamicIO in Next.js 16.
     useCache: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        // Google profile pictures (OAuth avatars)
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
