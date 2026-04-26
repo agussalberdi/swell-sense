@@ -2,7 +2,7 @@
 
 // ---------------------------------------------------------------------------
 // Favourites — typed localStorage schema v1
-// Only imported by Client Components (SpotChips).
+// Only imported by Client Components (e.g. SpotSelector).
 // ---------------------------------------------------------------------------
 
 const STORAGE_KEY = 'swellsense-favourites'

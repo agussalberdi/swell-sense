@@ -75,8 +75,7 @@
 **Goal:** Let the user pick any surf spot in the world.
 
 ### 3.1 Spot Search ✅
-- [x] Create `src/components/SpotSearch.tsx` — Client Component with debounced input
-- [x] Geocode via OpenStreetMap Nominatim (free, 500 ms debounce)
+- [x] Geocode via OpenStreetMap Nominatim — implemented inside `SpotSelector.tsx` (debounced) when few preset matches
 - [x] On spot select: shallow-push `?lat=&lng=&name=` to the URL (no full page reload)
 
 ### 3.2 URL-Driven State ✅

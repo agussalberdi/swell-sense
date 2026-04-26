@@ -26,23 +26,16 @@ function GlassCard({ children, className = '' }: { children: React.ReactNode; cl
 export default function Loading() {
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
-      <div className="mx-auto max-w-md px-4 pb-16">
+      <div className="mx-auto max-w-md md:max-w-2xl lg:max-w-5xl px-4 pb-28 md:pb-10">
 
-        {/* ── Header ───────────────────────────────────────── */}
-        <div className="flex items-center justify-between py-5">
-          <Bone className="h-6 w-32" />
-          <Bone className="h-8 w-36 rounded-full" />
-        </div>
-
-        {/* ── Spot chips ───────────────────────────────────── */}
-        <div className="flex gap-2 mb-4 overflow-hidden">
-          {[80, 100, 72, 90, 68, 85, 76].map((w) => (
-            <div
-              key={w}
-              className="h-7 flex-shrink-0 rounded-full animate-pulse"
-              style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
-            />
-          ))}
+        {/* ── Header (logo + nav + spot selector + auth) ── */}
+        <div className="flex items-center justify-between gap-2 py-5">
+          <Bone className="h-6 w-32 flex-shrink-0" />
+          <div className="hidden md:block flex-1 max-w-sm mx-2 h-4 rounded" />
+          <div className="flex items-center gap-2">
+            <Bone className="h-8 w-36 rounded-full" />
+            <Bone className="h-8 w-8 rounded-full" />
+          </div>
         </div>
 
         {/* ── Location badge ───────────────────────────────── */}
@@ -82,8 +75,8 @@ export default function Loading() {
           <Bone className="h-9 w-full" />
         </GlassCard>
 
-        {/* ── Conditions grid ──────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* ── Conditions grid (matches responsive 2→3 col) ── */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
           {[1, 2].map((i) => (
             <GlassCard key={i} className="p-4 space-y-2">
               <Bone className="h-3 w-16" />
@@ -91,7 +84,7 @@ export default function Loading() {
               <Bone className="h-3 w-14" />
             </GlassCard>
           ))}
-          <div className="col-span-2">
+          <div className="col-span-2 md:col-span-1">
             <GlassCard className="p-4 space-y-2">
               <Bone className="h-3 w-20" />
               <Bone className="h-6 w-16" />
