@@ -28,12 +28,13 @@ export default function Loading() {
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
       <div className="mx-auto max-w-md md:max-w-2xl lg:max-w-5xl px-4 pb-28 md:pb-10">
 
-        {/* ── Header (logo + nav + spot selector + auth) ── */}
+        {/* ── Header (logo + nav + unit toggle + spot selector + auth) ── */}
         <div className="flex items-center justify-between gap-2 py-5">
           <Bone className="h-6 w-32 flex-shrink-0" />
           <div className="hidden md:block flex-1 max-w-sm mx-2 h-4 rounded" />
           <div className="flex items-center gap-2">
-            <Bone className="h-8 w-36 rounded-full" />
+            <Bone className="h-7 w-[4.25rem] rounded-full flex-shrink-0" />
+            <Bone className="h-7 w-36 rounded-full" />
             <Bone className="h-8 w-8 rounded-full" />
           </div>
         </div>

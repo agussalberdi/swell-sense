@@ -153,10 +153,10 @@
 - [x] `src/app/api/auth/[...nextauth]/route.ts` — Auth.js route handler
 - [x] `AuthButton.tsx` — avatar dropdown (My Profile / Sign out) when signed in; Google sign-in pill when not
 - [x] `SessionProvider` wrapper in root layout for client-side `useSession`
-- [x] Dashboard reads session + profile server-side; both fetched in parallel with surf data
+- [x] Dashboard resolves `unitSystem` (profile → `ssr-units` cookie → imperial), then fetches surf data with that choice
 - [x] `generateBriefing()` accepts optional `userProfile` — quiver + skill level injected into prompt
 - [x] Protected `/profile` page (redirect to `/dashboard` if unauthenticated)
-- [x] `ProfileForm.tsx` — skill level selector, home break dropdown, quiver board picker
+- [x] `ProfileForm.tsx` — skill level selector, home break dropdown, quiver board picker, `UnitPreferenceToggle` (measurements)
 - [x] `PATCH /api/profile` — upsert profile; sets `onboardingCompleted = true` once skill + quiver filled; accepts `unitSystem`
 - [x] **Display units** — `profiles.unitSystem` for signed-in users; `ssr-units` cookie for guests; dashboard header `UnitToggle` + profile **Measurements** section; `getSurfData(spot, unitSystem)` with units threaded through charts
 - [ ] Add Google OAuth credentials + `POSTGRES_URL` to Vercel env vars (**requires manual setup — see below**)
