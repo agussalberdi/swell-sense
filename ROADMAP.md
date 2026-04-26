@@ -70,38 +70,35 @@
 
 ---
 
-## Phase 3 — Multi-Spot & Location Search 📍
+## Phase 3 — Multi-Spot & Location Search ✅
 
 **Goal:** Let the user pick any surf spot in the world.
 
-### 3.1 Spot Search
-- [ ] Create `src/components/SpotSearch.tsx` — Client Component with debounced input
-- [ ] Geocode via Mapbox Search API or OpenStreetMap Nominatim (free)
-- [ ] On spot select: shallow-push `?lat=&lng=&name=` to the URL (no full page reload)
+### 3.1 Spot Search ✅
+- [x] Create `src/components/SpotSearch.tsx` — Client Component with debounced input
+- [x] Geocode via OpenStreetMap Nominatim (free, 500 ms debounce)
+- [x] On spot select: shallow-push `?lat=&lng=&name=` to the URL (no full page reload)
 
-### 3.2 URL-Driven State
-- [ ] `page.tsx` reads `searchParams` for coordinates — makes every dashboard URL shareable + bookmarkable
-- [ ] Add a "Favourite Spots" list persisted in `localStorage` (versioned schema, `v1`)
+### 3.2 URL-Driven State ✅
+- [x] `page.tsx` reads `searchParams` for coordinates — makes every dashboard URL shareable + bookmarkable
+- [x] Add a "Favourite Spots" list persisted in `localStorage` (versioned schema, `v1`) via `src/lib/favourites.ts`
 
-### 3.3 Spot Library
-- [ ] Pre-seed `src/lib/spots.ts` with 20 iconic spots (Pipeline, Jeffreys Bay, Hossegor, Uluwatu, etc.) with coordinates + UTC offset
-- [ ] Render as quick-select chips in the header
+### 3.3 Spot Library ✅
+- [x] Pre-seed `src/lib/spots.ts` with 20 iconic spots (Pipeline, Jeffreys Bay, Hossegor, Uluwatu, etc.) with coordinates + UTC offset
+- [x] Render as quick-select chips in the header (`SpotChips.tsx`) — favourites sorted to front, heart toggle
 
 ---
 
-## Phase 4 — Tidal & Wind Detail View 🌬️
+## Phase 4 — Tidal & Wind Detail View ✅
 
 **Goal:** Expand the forecast beyond 12 hours with richer data visualisation.
 
-- [ ] **7-Day Forecast Strip** — horizontal scroll row showing daily Vibe Score bars (RSC, no JS)
-- [ ] **Tidal Chart** — SVG sine-wave chart showing today's tide curve (high/low points annotated)
-- [ ] **Wind Rose** — SVG polar chart showing wind direction/speed breakdown (Client Component)
-- [ ] **Swell Window** — highlight the optimal 2-hour window within the day (computed server-side, passed as props)
+- [x] **7-Day Forecast Strip** — horizontal scroll row showing daily Vibe Score bars (RSC, no JS) — `WeekStrip.tsx`
+- [x] **Tidal Chart** — SVG sine-wave chart showing today's tide curve (high/low points annotated) — `TidalChart.tsx`
+- [x] **Wind Rose** — SVG polar chart showing wind direction/speed breakdown — `WindRose.tsx`
+- [x] **Swell Window** — highlight the optimal 2-hour window within the day (computed server-side in `transform()`, rendered as badge in `page.tsx`)
 
-**New components:**
-- `src/components/TidalChart.tsx`
-- `src/components/WindRose.tsx`
-- `src/components/WeekStrip.tsx`
+**New components:** `WeekStrip.tsx`, `TidalChart.tsx`, `WindRose.tsx`
 
 ---
 
@@ -200,4 +197,4 @@ return clamp(score, 0, 100)
 
 ---
 
-*Last updated: Phase 2 complete. Up next: Phase 3 — Multi-Spot & Location Search.*
+*Last updated: Phase 4 complete. Up next: Phase 5 — Push Notifications & Alerts.*

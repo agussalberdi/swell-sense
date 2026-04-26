@@ -4,9 +4,14 @@ import VibeGauge from '@/components/VibeGauge'
 import ForecastChart from '@/components/ForecastChart'
 import AIBriefing from '@/components/AIBriefing'
 import Logo from '@/components/ui/logo'
+import SpotChips from '@/components/SpotChips'
+import SpotSearch from '@/components/SpotSearch'
+import WeekStrip from '@/components/WeekStrip'
+import TidalChart from '@/components/TidalChart'
+import WindRose from '@/components/WindRose'
 import { getSurfData } from '@/lib/stormglass'
 import { generateBriefing } from '@/lib/briefing'
-import { DEFAULT_SPOT } from '@/lib/spots'
+import { resolveSpot } from '@/lib/spots'
 
 // Caching is handled by 'use cache' + cacheLife('hours') inside getSurfData().
 // With dynamicIO: true, this page is rendered dynamically per-request while
@@ -119,13 +124,19 @@ function TempIcon() {
 }
 
 // ---------------------------------------------------------------------------
-// Page — async RSC. data fetched server-side, minimal props to client leaves.
+// Page — async RSC. Spot resolved from URL searchParams.
 // ---------------------------------------------------------------------------
-export default async function HomePage() {
-  const data = await getSurfData(DEFAULT_SPOT)
-  // generateBriefing runs in parallel with the page render — cached for 1 h.
-  // Falls back to data.boardPick if OPENAI_API_KEY is not set.
-  const briefingText = await generateBriefing(data, DEFAULT_SPOT)
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string; lat?: string; lng?: string; name?: string }>
+}) {
+  const params = await searchParams
+  const spot = resolveSpot(params)
+
+  const data = await getSurfData(spot)
+  // generateBriefing is cached for 1 h; falls back to data.boardPick without an OpenAI key.
+  const briefingText = await generateBriefing(data, spot)
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
@@ -134,13 +145,37 @@ export default async function HomePage() {
         {/* ── App Header ───────────────────────────────────── */}
         <header className="flex items-center justify-between py-5">
           <Logo />
-          <div className="flex items-center gap-1.5 text-sm" style={{ color: '#94A3B8' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-            </svg>
-            <span>{data.location}</span>
+          <div className="flex items-center gap-2">
+            <Suspense fallback={null}>
+              <SpotSearch />
+            </Suspense>
           </div>
         </header>
+
+        {/* ── Spot Chips ───────────────────────────────────── */}
+        <div className="mb-4 -mx-1">
+          <Suspense fallback={
+            <div className="flex gap-2 overflow-hidden">
+              {[80, 100, 72, 90, 68].map((w) => (
+                <div
+                  key={w}
+                  className="h-7 rounded-full flex-shrink-0 animate-pulse"
+                  style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
+                />
+              ))}
+            </div>
+          }>
+            <SpotChips />
+          </Suspense>
+        </div>
+
+        {/* ── Active location badge ─────────────────────────── */}
+        <div className="flex items-center gap-1.5 text-sm mb-4" style={{ color: '#94A3B8' }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+          </svg>
+          <span style={{ color: '#FFFFFF' }}>{data.location}</span>
+        </div>
 
         {/* ── Vibe Score ───────────────────────────────────── */}
         <GlassCard className="p-6 mb-4">
@@ -195,6 +230,76 @@ export default async function HomePage() {
           </div>
         </div>
 
+        {/* ── 7-Day Forecast ───────────────────────────────── */}
+        <GlassCard className="p-5 mb-4">
+          <h2 className="text-sm font-semibold mb-3" style={{ color: '#FFFFFF' }}>
+            7-Day Outlook
+          </h2>
+          <WeekStrip weekForecast={data.weekForecast} />
+        </GlassCard>
+
+        {/* ── Tidal Chart ───────────────────────────────────── */}
+        <GlassCard className="p-5 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
+              Tidal Curve
+            </h2>
+            <span className="text-xs font-mono" style={{ color: '#94A3B8' }}>24 h</span>
+          </div>
+          <Suspense fallback={<ChartSkeleton />}>
+            <TidalChart tidalCurve={data.tidalCurve} />
+          </Suspense>
+        </GlassCard>
+
+        {/* ── Wind Rose + Swell Window ─────────────────────── */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Wind Rose */}
+          <GlassCard className="p-4 flex flex-col items-center">
+            <p className="text-xs font-semibold mb-3 w-full" style={{ color: '#94A3B8' }}>
+              Wind Distribution
+            </p>
+            <Suspense fallback={
+              <div className="w-20 h-20 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            }>
+              <WindRose windRoseData={data.windRoseData} facingDeg={spot.facingDeg} />
+            </Suspense>
+          </GlassCard>
+
+          {/* Swell Window */}
+          <GlassCard className="p-4 flex flex-col justify-between">
+            <p className="text-xs font-semibold mb-2" style={{ color: '#94A3B8' }}>
+              Peak Window
+            </p>
+            {data.swellWindow ? (
+              <>
+                <div
+                  className="rounded-lg p-3 text-center mb-2"
+                  style={{ background: 'rgba(0,245,255,0.08)', border: '1px solid rgba(0,245,255,0.2)' }}
+                >
+                  <p className="text-xs font-mono mb-0.5" style={{ color: '#00F5FF' }}>
+                    {data.swellWindow.startHour}
+                  </p>
+                  <p className="text-xs" style={{ color: '#64748B' }}>—</p>
+                  <p className="text-xs font-mono" style={{ color: '#00F5FF' }}>
+                    {data.swellWindow.endHour}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs" style={{ color: '#64748B' }}>Score</span>
+                  <span
+                    className="text-lg font-bold"
+                    style={{ color: '#00F5FF', fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    {data.swellWindow.score}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p className="text-xs" style={{ color: '#64748B' }}>No data</p>
+            )}
+          </GlassCard>
+        </div>
+
         {/* ── AI Board Pick ────────────────────────────────── */}
         <section
           className="rounded-2xl p-5"
@@ -221,7 +326,7 @@ export default async function HomePage() {
                 <AIBriefing
                   initialText={briefingText}
                   data={data}
-                  spot={DEFAULT_SPOT}
+                  spot={spot}
                 />
               </Suspense>
             </div>
