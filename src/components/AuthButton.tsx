@@ -1,7 +1,6 @@
 'use client'
 
 import { signIn, signOut, useSession } from 'next-auth/react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -27,19 +26,24 @@ function UserMenu({ name, image }: { name: string | null; image: string | null }
         aria-expanded={open}
       >
         {image ? (
-          <Image
+          // Plain <img> avoids next/image domain config for OAuth avatars
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={image}
             alt={name ?? 'User avatar'}
             width={24}
             height={24}
             className="rounded-full"
+            style={{ width: 24, height: 24, objectFit: 'cover' }}
           />
         ) : (
           <span
-            className="flex items-center justify-center rounded-full text-xs font-bold"
-            style={{ width: 24, height: 24, background: 'rgba(0,245,255,0.2)', color: '#00F5FF' }}
+            className="flex items-center justify-center rounded-full"
+            style={{ width: 24, height: 24, background: 'rgba(0,245,255,0.15)', color: '#00F5FF' }}
           >
-            {name?.[0]?.toUpperCase() ?? '?'}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
           </span>
         )}
         <svg

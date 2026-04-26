@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { profiles } from '@/lib/db/schema'
@@ -61,12 +60,14 @@ export default async function ProfilePage() {
           }}
         >
           {session.user.image ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={session.user.image}
               alt={session.user.name ?? 'Avatar'}
               width={52}
               height={52}
               className="rounded-full flex-shrink-0"
+              style={{ width: 52, height: 52, objectFit: 'cover' }}
             />
           ) : (
             <div

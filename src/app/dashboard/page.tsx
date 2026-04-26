@@ -11,6 +11,7 @@ import WeekStrip from '@/components/WeekStrip'
 import TidalChart from '@/components/TidalChart'
 import WindRose from '@/components/WindRose'
 import AuthButton from '@/components/AuthButton'
+import DashboardNav from '@/components/DashboardNav'
 import { getSurfData } from '@/lib/stormglass'
 import { generateBriefing } from '@/lib/briefing'
 import { resolveSpot } from '@/lib/spots'
@@ -155,13 +156,18 @@ export default async function DashboardPage({
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
-      <div className="mx-auto max-w-md px-4 pb-16">
+      {/* Bottom tab bar — mobile only, outside scroll container */}
+      <DashboardNav variant="bottom" />
+
+      <div className="mx-auto max-w-md md:max-w-2xl lg:max-w-5xl px-4 pb-28 md:pb-10">
 
         {/* ── App Header ───────────────────────────────────── */}
         <header className="flex items-center justify-between py-5">
           <Link href="/" aria-label="SwellSense home">
             <Logo />
           </Link>
+          {/* Top nav — tablet + desktop only */}
+          <DashboardNav variant="top" />
           <div className="flex items-center gap-2">
             <Suspense fallback={null}>
               <SpotSearch />
@@ -171,7 +177,7 @@ export default async function DashboardPage({
         </header>
 
         {/* ── Spot Chips ───────────────────────────────────── */}
-        <div className="mb-4 -mx-1">
+        <div id="spots" className="mb-4 -mx-1">
           <Suspense fallback={
             <div className="flex gap-2 overflow-hidden">
               {[80, 100, 72, 90, 68].map((w) => (
@@ -195,18 +201,51 @@ export default async function DashboardPage({
           <span style={{ color: '#FFFFFF' }}>{data.location}</span>
         </div>
 
-        {/* ── Vibe Score ───────────────────────────────────── */}
+        {/* ── Vibe Score + Stats ────────────────────────────── */}
+        {/*
+          Mobile:  Gauge centred, description below, stats in separate 2-col row.
+          md+:     Gauge + description on the left, Height/Period stack on the right
+                   inside the same card — matching the Figma tablet/desktop design.
+        */}
         <GlassCard className="p-6 mb-4">
-          <Suspense fallback={<GaugeSkeleton />}>
-            <VibeGauge score={data.vibeScore} />
-          </Suspense>
-          <p className="mt-4 text-center text-sm leading-6" style={{ color: '#94A3B8' }}>
-            {data.description}
-          </p>
+          <div className="md:flex md:items-center md:gap-8">
+            {/* Left: gauge + description */}
+            <div className="flex-1 min-w-0">
+              <Suspense fallback={<GaugeSkeleton />}>
+                <VibeGauge score={data.vibeScore} />
+              </Suspense>
+              <p className="mt-4 text-center text-sm leading-6" style={{ color: '#94A3B8' }}>
+                {data.description}
+              </p>
+            </div>
+
+            {/* Right: stats — inline on md+, hidden on mobile (shown as separate cards below) */}
+            <div
+              className="hidden md:flex flex-col gap-4 flex-shrink-0"
+              style={{ minWidth: 120 }}
+            >
+              {[
+                { label: 'HEIGHT',  value: data.waveHeight },
+                { label: 'PERIOD',  value: data.period },
+              ].map(({ label, value }) => (
+                <div key={label} className="text-right">
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: '#00F5FF', fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    {value}
+                  </p>
+                  <p className="text-xs font-semibold mt-0.5" style={{ color: '#64748B', letterSpacing: '0.08em' }}>
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </GlassCard>
 
-        {/* ── Wave Stats ───────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* ── Wave Stats — mobile only (hidden on md+) ─────── */}
+        <div className="grid grid-cols-2 gap-3 mb-4 md:hidden">
           <StatCard label="Height" value={data.waveHeight} />
           <StatCard label="Period" value={data.period} />
         </div>
@@ -225,7 +264,9 @@ export default async function DashboardPage({
         </GlassCard>
 
         {/* ── Conditions ───────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* Mobile: 2-col grid, Water Temp spans full width.
+            md+:   3-col grid, all cards equal width. */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
           <ConditionCard
             icon={<WindIcon />}
             label="Wind"
@@ -238,7 +279,7 @@ export default async function DashboardPage({
             primary={data.tide.label}
             secondary={data.tide.time}
           />
-          <div className="col-span-2">
+          <div className="col-span-2 md:col-span-1">
             <ConditionCard
               icon={<TempIcon />}
               label="Water Temp"
@@ -320,6 +361,7 @@ export default async function DashboardPage({
 
         {/* ── AI Board Pick ────────────────────────────────── */}
         <section
+          id="ai-pick"
           className="rounded-2xl p-5"
           style={{
             background: 'linear-gradient(135deg, rgba(0,245,255,0.05) 0%, rgba(125,38,205,0.05) 100%)',

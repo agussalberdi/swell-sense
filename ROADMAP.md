@@ -117,6 +117,19 @@
 
 ---
 
+## Phase 4.6 — Responsive Dashboard ✅
+
+**Goal:** Match the Figma designs at all three breakpoints — mobile, tablet, and desktop.
+
+- [x] `DashboardNav.tsx` — adaptive nav: bottom tab bar on mobile, horizontal top links on tablet/desktop
+- [x] Breakpoints: `max-w-md` (mobile) → `max-w-2xl` (tablet) → `max-w-5xl` (desktop)
+- [x] Hero card: Height + Period stats move into the card right-side on `md+`, hidden as separate cards
+- [x] Conditions grid: `grid-cols-2` → `md:grid-cols-3`; Water Temp no longer full-width on tablet/desktop
+- [x] Bottom nav padding (`pb-28`) prevents content hiding behind the fixed bottom bar on mobile
+- [x] Section anchors: `#spots`, `#ai-pick` for tab deep-linking
+
+---
+
 ## Phase 5 — Push Notifications & Alerts 🔔
 
 **Goal:** SwellSense tells you when conditions hit your threshold — without you checking.
