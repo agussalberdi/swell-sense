@@ -129,14 +129,24 @@
 
 ---
 
-## Phase 6 — Authentication & Personalisation 👤
+## Phase 6 — Authentication & Personalisation ✅
 
-**Goal:** Persistent user profile — quiver, favourite spots, alert prefs.
+**Goal:** Persistent user profile — quiver, skill level, home break. AI briefing personalised to the surfer.
 
-- [ ] Auth via **NextAuth.js v5** with GitHub + Google providers (no passwords)
-- [ ] Schema in **Vercel Postgres** (Drizzle ORM): `users`, `spots`, `alerts`, `sessions`
-- [ ] Protected `/profile` route — manage quiver (board types + fin setups), skill level, home break
-- [ ] AI briefing becomes personalised: "You ride a 5'10" thruster with FCS II Performers — here's why today's 12s period works for you"
+- [x] **Auth.js v5** (`next-auth@beta`) with Google provider — Google OAuth only for MVP
+- [x] **Neon Postgres** + **Drizzle ORM** — `users` (+ `userTier`), `accounts`, `sessions`, `verificationTokens`, `profiles`
+- [x] `userTier` column (`free` | `pro` | `team`) on `users` — monetisation hook, zero future schema changes needed
+- [x] `profiles` table — `homeBreakId`, `skillLevel`, `boards` (JSONB), `onboardingCompleted`
+- [x] `src/lib/auth.ts` — DrizzleAdapter with extended table map; session callback exposes `user.id` + `user.tier`
+- [x] `src/app/api/auth/[...nextauth]/route.ts` — Auth.js route handler
+- [x] `AuthButton.tsx` — avatar dropdown (My Profile / Sign out) when signed in; Google sign-in pill when not
+- [x] `SessionProvider` wrapper in root layout for client-side `useSession`
+- [x] Dashboard reads session + profile server-side; both fetched in parallel with surf data
+- [x] `generateBriefing()` accepts optional `userProfile` — quiver + skill level injected into prompt
+- [x] Protected `/profile` page (redirect to `/dashboard` if unauthenticated)
+- [x] `ProfileForm.tsx` — skill level selector, home break dropdown, quiver board picker
+- [x] `PATCH /api/profile` — upsert profile; sets `onboardingCompleted = true` once skill + quiver filled
+- [ ] Add Google OAuth credentials + `POSTGRES_URL` to Vercel env vars (**requires manual setup — see below**)
 
 ---
 
@@ -212,4 +222,4 @@ return clamp(score, 0, 100)
 
 ---
 
-*Last updated: Phase 4 complete. Up next: Phase 5 — Push Notifications & Alerts.*
+*Last updated: Phase 6 (Auth & Personalisation) complete. Pending: Google OAuth credentials + Neon Postgres URL in Vercel env vars. Up next: Phase 7 — Native PWA.*

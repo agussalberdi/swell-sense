@@ -10,9 +10,14 @@ import SpotSearch from '@/components/SpotSearch'
 import WeekStrip from '@/components/WeekStrip'
 import TidalChart from '@/components/TidalChart'
 import WindRose from '@/components/WindRose'
+import AuthButton from '@/components/AuthButton'
 import { getSurfData } from '@/lib/stormglass'
 import { generateBriefing } from '@/lib/briefing'
 import { resolveSpot } from '@/lib/spots'
+import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { profiles } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 
 // Caching is handled by 'use cache' + cacheLife('hours') inside getSurfData().
 // With dynamicIO: true, this page is rendered dynamically per-request while
@@ -135,9 +140,18 @@ export default async function DashboardPage({
   const params = await searchParams
   const spot = resolveSpot(params)
 
-  const data = await getSurfData(spot)
+  // Session + profile are fetched in parallel with surf data
+  const [data, session] = await Promise.all([
+    getSurfData(spot),
+    auth(),
+  ])
+
+  const profile = session?.user?.id
+    ? await db.query.profiles.findFirst({ where: eq(profiles.userId, session.user.id) }) ?? null
+    : null
+
   // generateBriefing is cached for 1 h; falls back to data.boardPick without an OpenAI key.
-  const briefingText = await generateBriefing(data, spot)
+  const briefingText = await generateBriefing(data, spot, profile ?? undefined)
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0A192F' }}>
@@ -152,6 +166,7 @@ export default async function DashboardPage({
             <Suspense fallback={null}>
               <SpotSearch />
             </Suspense>
+            <AuthButton />
           </div>
         </header>
 
